@@ -55,10 +55,98 @@ make
 ./ssu_clean
 ```
 
+실행하면 다음 프롬프트가 출력된다.
+
 ```
-20222824> help
-20222824> fmd5 <filename>
-20222824> exit
+20222824>
+```
+
+사용 가능한 명령어: `fmd5`, `help`, `exit`
+
+---
+
+### 사용자 매뉴얼
+
+#### fmd5 — 중복 파일 탐색 (크기/확장자 기준)
+
+```
+fmd5 -s [FILE_EXTENSION] [MINSIZE] [MAXSIZE] [TARGET_DIRECTORY]
+```
+
+| 인자 | 설명 |
+|------|------|
+| `FILE_EXTENSION` | `*` 또는 `*.확장자` |
+| `MINSIZE` / `MAXSIZE` | 최소·최대 파일 크기 (`~` 입력 시 제한 없음) |
+| `TARGET_DIRECTORY` | 탐색할 디렉토리 경로 |
+
+```bash
+fmd5 -s * ~ ~ ~/test          # 모든 파일, 크기 제한 없음
+fmd5 -s *.txt 1KB 10MB ~/test # .txt 파일, 1KB~10MB 범위
+```
+
+---
+
+#### 시간 조건 옵션
+
+```
+fmd5 -a [ATIME_FROM] [ATIME_TO] [TARGET_DIRECTORY]   # 접근 시간
+fmd5 -m [MTIME_FROM] [MTIME_TO] [TARGET_DIRECTORY]   # 수정 시간
+fmd5 -c [CTIME_FROM] [CTIME_TO] [TARGET_DIRECTORY]   # 상태 변경 시간
+```
+
+지원 시간 형식: `YYYY` / `YYYY:MM` / `YYYY:MM:DD` / `YYYY:MM:DD:HH`  
+`~`는 범위 제한 없음을 의미한다.
+
+---
+
+#### 추가 탐색 옵션
+
+| 옵션 | 설명 |
+|------|------|
+| `-sh` | 하드 링크 파일 제외 (inode 공유 파일 탐색 결과에서 제외) |
+| `-d [DEPTH]` | BFS 탐색 깊이 제한 |
+| `-n [COUNT]` | 출력할 중복 세트 개수 제한 |
+| `-e [DIR]` | 특정 디렉토리 제외 (최대 3개) |
+| `-p [MODE]` | 특정 권한의 파일만 탐색 |
+| `-x [COUNT]` | 최소 중복 파일 개수 제한 |
+| `-o [FILE]` | 결과를 파일로 저장 |
+| `-r [MODE]` | 결과 정렬 기준 선택 |
+
+**정렬 모드 (`-r`):**
+
+| 모드 | 설명 |
+|------|------|
+| `size_desc` / `size_asc` | 파일 크기 내림차순 / 오름차순 |
+| `mtime_desc` / `mtime_asc` | 수정 시간 내림차순 / 오름차순 |
+| `path_desc` / `path_asc` | 대표 경로 내림차순 / 사전순 |
+
+---
+
+#### 삭제 단계 명령 (`>>` 프롬프트)
+
+중복 세트 출력 후 `>>` 프롬프트에서 아래 명령을 사용한다.
+
+```
+[SET_INDEX] d [LIST_IDX]    # 해당 세트에서 특정 파일 하나 삭제
+[SET_INDEX] i               # 파일마다 삭제 여부 개별 질문
+[SET_INDEX] f [-u POLICY]   # 보존 1개 제외 나머지 삭제
+[SET_INDEX] t [-u POLICY]   # 보존 1개 제외 나머지 휴지통 이동
+exit                        # 삭제 단계 종료, 상위 프롬프트로 복귀
+help                        # 사용법 출력
+```
+
+**보존 정책 (`-u`):**
+
+| 옵션 | 설명 |
+|------|------|
+| `newest` | 가장 최근 수정 파일 보존 |
+| `oldest` | 가장 오래된 수정 파일 보존 |
+| `pathshort` | 절대 경로가 가장 짧은 파일 보존 |
+| `pathlong` | 절대 경로가 가장 긴 파일 보존 |
+
+```bash
+1 f -u newest      # 세트 1에서 최신 파일 보존 후 나머지 삭제
+2 t -u pathshort   # 세트 2에서 경로 짧은 파일 보존 후 나머지 휴지통 이동
 ```
 ---
 
