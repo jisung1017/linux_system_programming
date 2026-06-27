@@ -1,6 +1,6 @@
 # Linux Systems Programming — Assignments
 
-숭실대학교 2026-1학기 **리눅스 시스템 프로그래밍** 수업 과제 모음입니다.
+3-1 **리눅스 시스템 프로그래밍** 수업 과제 모음입니다.
 
 POSIX 시스템 콜(`fork`, `exec`, `pipe`, `dup2`, `read`, `write` 등)을 직접 사용하여 구현했으며, `system()` 함수 및 표준 라이브러리 고수준 함수 사용이 제한된 환경에서 작성했습니다.
 
